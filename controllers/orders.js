@@ -7,7 +7,7 @@ export const addOrder = async (req, res) => {
     product,
     user,
     quantity,
-    paymentInfo: { 
+    paymentInfo: {
       ...paymentInfo,
       orderStatus: paymentInfo.orderStatus || "Processing",
       deliveredAt: paymentInfo.deliveredAt || { createdAt: new Date() },
@@ -71,5 +71,30 @@ export const deleteOrder = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getTotalPrice = async (req, res) => {
+  try {
+    const result = await order.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: { $toDouble: "$paymentInfo.totalPrice" } },
+        },
+      },
+    ]);
+    console.log(result);
+    if (result.length > 0) {
+      const totalPriceSum = result[0].total;
+      res.json({ totalPriceSum });
+    } else {
+      res
+        .status(404)
+        .json({ error: "No orders found or totalPrice not found in orders." });
+    }
+  } catch (error) {
+    console.error("Error calculating total price sum:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
