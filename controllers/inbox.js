@@ -4,9 +4,11 @@ import { inbox } from "../models/inbox.js";
 export const addMessage = async (req, res) => {
   // console.log(req.body);
   // const author = req.userId;
-  const { message } = req.body;
+  const { message, email, user } = req.body;
   const saveData = new inbox({
     message,
+    email,
+    user,
   });
   try {
     await saveData.save();
@@ -20,10 +22,7 @@ export const addMessage = async (req, res) => {
 //Get Message
 export const getMessage = async (req, res) => {
   try {
-    const message = await inbox
-      .find()
-      .sort({ createdAt: -1 })
-      .populate("users")
+    const message = await inbox.find().sort({ createdAt: -1 }).populate("user");
     res.status(200).json({ message });
   } catch (error) {
     console.log(error);
@@ -50,7 +49,7 @@ export const getMessageById = async (req, res) => {
 export const updateMessage = async (req, res) => {
   const { id } = req.params;
   // const author = req.userId;
-  const { message } = req.body;
+  const { message, email } = req.body;
   try {
     const updatedata = {
       message,

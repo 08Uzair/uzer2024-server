@@ -1,13 +1,21 @@
 import mongoose from "mongoose";
 
 export const inboxSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+  },
   message: {
     type: String,
     required: true,
   },
-  order: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "order",
+    ref: "user",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
